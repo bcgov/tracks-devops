@@ -1,0 +1,40 @@
+kind: Template
+apiVersion: v1
+labels:
+  template: tracks-configmap-template
+metadata:
+  name: tracks-secrets
+parameters:
+  - name: ENV_NAME
+    displayName: Environment Name
+    description: Environment Name
+    required: true
+  - name: JWT_ISSUER_URI
+    required: true
+  - name: KEYCLOAK_REALM
+    required: true
+  - name: KEYCLOAK_URL
+    required: true
+  - name: BACKEND_SPRING_PROFILES
+    required: true
+objects:
+  - kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: tracks-keycloak
+    data:
+      JWT_ISSUER_URI: ${JWT_ISSUER_URI}
+  - kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: tracks-frontend-build-config
+    data:
+      KEYCLOAK_CLIENT_ID: TRACKS
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      KEYCLOAK_URL: ${KEYCLOAK_URL}
+  - kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: tracks-backend-config
+    data:
+      SPRING_PROFILES_ACTIVE: ${BACKEND_SPRING_PROFILES}

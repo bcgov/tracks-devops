@@ -1,0 +1,80 @@
+---
+kind: Template
+apiVersion: v1
+labels:
+  template: tracks-frontend-bc-template
+metadata:
+  name: frontend-bc
+  creationTimestamp:
+parameters:
+  - name: ENV_NAME
+    displayName: Environment Name
+    description: Environment Name
+    required: true
+  - name: API_BASE
+    required: true
+objects:
+  - kind: ImageStream
+    apiVersion: image.openshift.io/v1
+    metadata:
+      annotations:
+        description: Tracks Frontend Image Stream
+      name: tracks-frontend
+    spec:
+      lookupPolicy:
+        local: false
+  - kind: BuildConfig
+    apiVersion: build.openshift.io/v1
+    metadata:
+      annotations:
+        description: Tracks Frontend builder
+      name: tracks-frontend
+    spec:
+      nodeSelector: null
+      output:
+        to:
+          kind: ImageStreamTag
+          name: tracks-frontend:latest
+      postCommit: { }
+      resources:
+        limits:
+          cpu: 2000m
+          memory: 2G
+        requests:
+          cpu: 500m
+          memory: 200M
+      runPolicy: SerialLatestOnly
+      source:
+        contextDir: frontend
+        git:
+          uri: "https://github.com/bcgov/tracks.git"
+        type: Git
+      strategy:
+        sourceStrategy:
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: API_BASE
+              value: ${API_BASE}
+            - name: KEYCLOAK_REALM
+              valueFrom:
+                configMapKeyRef:
+                  key: KEYCLOAK_REALM
+                  name: tracks-frontend-build-config
+            - name: KEYCLOAK_CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  key: KEYCLOAK_CLIENT_ID
+                  name: tracks-frontend-build-config
+            - name: KEYCLOAK_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: KEYCLOAK_URL
+                  name: tracks-frontend-build-config
+          from:
+            kind: ImageStreamTag
+            name: 'nodejs:10'
+            namespace: openshift
+        type: Source
+    status:
+      lastVersion: 0
