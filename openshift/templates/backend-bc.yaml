@@ -1,0 +1,57 @@
+---
+kind: Template
+apiVersion: v1
+labels:
+  template: tracks-backend-bc-template
+metadata:
+  name: backend-bc
+  creationTimestamp:
+parameters:
+  - name: ENV_NAME
+    displayName: Environment Name
+    description: Environment Name
+    required: true
+objects:
+  - kind: ImageStream
+    apiVersion: image.openshift.io/v1
+    metadata:
+      annotations:
+        description: Tracks Backend Image Stream
+      name: tracks-backend
+    spec:
+      lookupPolicy:
+        local: false
+  - kind: BuildConfig
+    apiVersion: build.openshift.io/v1
+    metadata:
+      annotations:
+        description: Tracks Backend builder
+      name: tracks-backend
+    spec:
+      nodeSelector: null
+      output:
+        to:
+          kind: ImageStreamTag
+          name: tracks-backend:latest
+      postCommit: { }
+      resources:
+        limits:
+          cpu: 2000m
+          memory: 2G
+        requests:
+          cpu: 500m
+          memory: 200M
+      runPolicy: SerialLatestOnly
+      source:
+        contextDir: backend
+        git:
+          uri: "https://github.com/bcgov/tracks.git"
+        type: Git
+      strategy:
+        sourceStrategy:
+          from:
+            kind: DockerImage
+            name: fabric8/s2i-java:latest
+        type: Source
+    status:
+      lastVersion: 0

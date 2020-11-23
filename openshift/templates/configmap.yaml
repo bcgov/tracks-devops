@@ -1,0 +1,20 @@
+kind: Template
+apiVersion: v1
+labels:
+  template: tracks-configmaps-template
+metadata:
+  name: tracks-configmaps
+parameters:
+  - name: ENV_NAME
+    displayName: Environment Name
+    description: Environment Name
+    required: true
+  - name: BACKEND_SPRING_PROFILES
+    required: true
+objects:
+  - kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: tracks-backend-config
+    data:
+      SPRING_PROFILES_ACTIVE: ${BACKEND_SPRING_PROFILES}
