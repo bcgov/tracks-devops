@@ -48,6 +48,7 @@ objects:
         contextDir: frontend
         git:
           uri: "https://github.com/bcgov/tracks.git"
+          ref: "main"
         type: Git
       strategy:
         sourceStrategy:

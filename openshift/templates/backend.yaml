@@ -92,7 +92,7 @@ objects:
               env:
                 - name: JAVA_APP_JAR
                   value: src-1.0-SNAPSHOT.jar
-                - name: GOV_BC_TRACKS_DB_URL
+                - name: TRACKS_DB_URL
                   value: 'jdbc:postgresql://tracks-postgresql:5432/tracks'
                 - name: TRACKS_DB_USER
                   valueFrom:

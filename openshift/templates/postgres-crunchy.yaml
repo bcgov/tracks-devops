@@ -4,7 +4,7 @@ apiVersion: v1
 labels:
   template: tracks-postgresql-persistent-template
 metadata:
-  name: postgresql-dc
+  name: postgresql-tracks-dc
   creationTimestamp:
 parameters:
   - name: ENV_NAME
