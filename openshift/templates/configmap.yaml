@@ -9,12 +9,19 @@ parameters:
     displayName: Environment Name
     description: Environment Name
     required: true
-  - name: BACKEND_SPRING_PROFILES
+  - name: JWT_ISSUER_URI
+    required: true
+  - name: KEYCLOAK_REALM
+    required: true
+  - name: KEYCLOAK_URL
     required: true
 objects:
   - kind: ConfigMap
     apiVersion: v1
     metadata:
-      name: tracks-backend-config
+      name: tracks-keycloak-config
     data:
-      SPRING_PROFILES_ACTIVE: ${BACKEND_SPRING_PROFILES}
+      KEYCLOAK_CLIENT_ID: tracks-ui
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      KEYCLOAK_URL: ${KEYCLOAK_URL}
+      JWT_ISSUER_URI: ${JWT_ISSUER_URI}

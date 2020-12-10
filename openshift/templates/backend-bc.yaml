@@ -51,8 +51,8 @@ objects:
       strategy:
         sourceStrategy:
           from:
-            kind: DockerImage
-            name: fabric8/s2i-java:latest
+            name: 'nodejs:10'
+            namespace: openshift
         type: Source
     status:
       lastVersion: 0

@@ -40,8 +40,8 @@ objects:
       ports:
         - name: web-backend
           protocol: TCP
-          port: 8080
-          targetPort: 8080
+          port: 6005
+          targetPort: 6005
       selector:
         name: tracks-backend
       type: ClusterIP
@@ -87,11 +87,11 @@ objects:
             - name: backend
               image: " "
               ports:
-                - containerPort: 8080
+                - containerPort: 6005
                   protocol: TCP
               env:
-                - name: JAVA_APP_JAR
-                  value: src-1.0-SNAPSHOT.jar
+                - name: NPM_RUN
+                  value: 'serve'
                 - name: TRACKS_DB_URL
                   value: 'jdbc:postgresql://tracks-postgresql:5432/tracks'
                 - name: TRACKS_DB_USER
@@ -104,11 +104,21 @@ objects:
                     secretKeyRef:
                       name: tracks-database-secrets
                       key: DATABASE_PASSWORD
-                - name: SPRING_PROFILES_ACTIVE
+                - name: KEYCLOAK_CLIENT_ID
                   valueFrom:
                     configMapKeyRef:
-                      name: tracks-backend-config
-                      key: SPRING_PROFILES_ACTIVE
+                      name: tracks-keycloak-config
+                      key: KEYCLOAK_CLIENT_ID
+                - name: KEYCLOAK_REALM
+                  valueFrom:
+                    configMapKeyRef:
+                      name: tracks-keycloak-config
+                      key: KEYCLOAK_REALM
+                - name: KEYCLOAK_URL
+                  valueFrom:
+                    configMapKeyRef:
+                      name: tracks-keycloak-config
+                      key: KEYCLOAK_URL
               resources:
                 request:
                   cpu: "${CPU_REQUEST}"
@@ -118,9 +128,9 @@ objects:
                   memory: "${MEMORY_LIMIT}"
               readinessProbe:
                 tcpSocket:
-                  port: 8080
-                initialDelaySeconds: 20
-                timeoutSeconds: 5
+                  port: 6005
+                initialDelaySeconds: 2
+                timeoutSeconds: 3
                 periodSeconds: 30
                 successThreshold: 1
                 failureThreshold: 3

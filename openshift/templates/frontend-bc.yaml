@@ -53,10 +53,25 @@ objects:
       strategy:
         sourceStrategy:
           env:
-            - name: NODE_ENV
-              value: production
-            - name: API_BASE
-              value: ${API_BASE}
+          - name: KEYCLOAK_CLIENT_ID
+            valueFrom:
+              configMapKeyRef:
+                name: tracks-keycloak-config
+                key: KEYCLOAK_CLIENT_ID
+          - name: KEYCLOAK_REALM
+            valueFrom:
+              configMapKeyRef:
+                name: tracks-keycloak-config
+                key: KEYCLOAK_REALM
+          - name: KEYCLOAK_URL
+            valueFrom:
+              configMapKeyRef:
+                name: tracks-keycloak-config
+                key: KEYCLOAK_URL
+          - name: API_BASE
+            value: ${API_BASE}
+            value: ${API_BASE}
+            value: ${API_BASE}
           from:
             kind: ImageStreamTag
             name: 'nodejs:10'

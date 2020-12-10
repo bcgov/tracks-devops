@@ -91,7 +91,7 @@ objects:
                   protocol: TCP
               env:
                 - name: NPM_RUN
-                  value: 'production'
+                  value: 'serve'
               resources:
                 request:
                   cpu: "${CPU_REQUEST}"

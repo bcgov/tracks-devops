@@ -20,7 +20,7 @@ static_resources:
                     - name: local_service
                       domains: ["*"]
                       routes:
-                        - match: { prefix: "/v1" }
+                        - match: { prefix: "/api" }
                           route:
                             cluster: backend
                         - match: { prefix: "/health" }
@@ -49,4 +49,4 @@ static_resources:
       hosts:
         - socket_address:
             address: tracks-backend
-            port_value: 8080
+            port_value: 6005
