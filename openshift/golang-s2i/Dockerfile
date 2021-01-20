@@ -13,3 +13,4 @@ RUN mkdir -p $SOURCE_DIR \
 WORKDIR $SOURCE_DIR
 USER 1001
 
+CMD ["/usr/libexec/s2i/run"]
