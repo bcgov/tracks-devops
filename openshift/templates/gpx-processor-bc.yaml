@@ -51,8 +51,8 @@ objects:
       strategy:
         sourceStrategy:
           from:
-            name: 'golang:1.12'
-            namespace: openshift
+            name: 'tracks-golang-s2i-builder:latest'
+            namespace: dgsbmb-tools
         type: Source
     status:
       lastVersion: 0

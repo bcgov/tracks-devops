@@ -24,5 +24,5 @@ MINIO_SECRET_KEY=`openssl rand -base64 40 | md5sum | head -c 32`
 #oc process -f ./backend-bc.yaml ENV_NAME=${ENV_NAME} | oc apply -f -
 #oc process -f ./frontend-bc.yaml ENV_NAME=${ENV_NAME} API_BASE=${API_BASE} | oc apply -f -
 #oc process -f ./backend.yaml CPU_REQUEST=400m CPU_LIMIT=1000m MEMORY_REQUEST=1000M MEMORY_LIMIT=2G ENV_NAME=${ENV_NAME} | oc apply -f -
-#oc process -f ./gpx-processor-bc.yaml ENV_NAME=${ENV_NAME} | oc apply -f -
+oc process -f ./gpx-processor-bc.yaml ENV_NAME=${ENV_NAME} | oc apply -f -
 #oc process -f ./frontend.yaml CPU_REQUEST=400m CPU_LIMIT=1000m MEMORY_REQUEST=500M MEMORY_LIMIT=2G ENV_NAME=${ENV_NAME} | oc apply -f -
