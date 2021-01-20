@@ -5,7 +5,9 @@ LABEL io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
 ENV CGO_ENABLED=0 \
     GOOS=linux \
     GOCACHE=/tmp \
-    SOURCE_DIR=/go/src
+    GO111MODULE=off \
+    SOURCE_DIR=/go/src/app \
+    GOPATH=/go
 
 COPY ./s2i/bin/ /usr/libexec/s2i
 
