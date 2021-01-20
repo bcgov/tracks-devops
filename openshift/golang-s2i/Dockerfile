@@ -1,5 +1,7 @@
 FROM golang:1.15
 
+LABEL io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
+
 ENV CGO_ENABLED=0 \
     GOOS=linux \
     GOCACHE=/tmp \
