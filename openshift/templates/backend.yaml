@@ -92,8 +92,12 @@ objects:
               env:
                 - name: NPM_RUN
                   value: 'serve'
-                - name: TRACKS_DB_URL
-                  value: 'jdbc:postgresql://tracks-postgresql:5432/tracks'
+                - name: TRACKS_DB_NAME
+                  value: 'tracks'
+                - name: TRACKS_DB_HOST
+                  value: 'tracks-postgresql'
+                - name: TRACKS_DB_PORT
+                  value: '5432'
                 - name: TRACKS_DB_USER
                   valueFrom:
                     secretKeyRef:
@@ -104,21 +108,11 @@ objects:
                     secretKeyRef:
                       name: tracks-database-secrets
                       key: DATABASE_PASSWORD
-                - name: KEYCLOAK_CLIENT_ID
+                - name: JWKS_URL
                   valueFrom:
                     configMapKeyRef:
                       name: tracks-keycloak-config
-                      key: KEYCLOAK_CLIENT_ID
-                - name: KEYCLOAK_REALM
-                  valueFrom:
-                    configMapKeyRef:
-                      name: tracks-keycloak-config
-                      key: KEYCLOAK_REALM
-                - name: KEYCLOAK_URL
-                  valueFrom:
-                    configMapKeyRef:
-                      name: tracks-keycloak-config
-                      key: KEYCLOAK_URL
+                      key: JWKS_URL
               resources:
                 request:
                   cpu: "${CPU_REQUEST}"

@@ -2,9 +2,9 @@
 kind: Template
 apiVersion: v1
 labels:
-  template: tracks-postgresql-persistent-template
+  template: tracks-minio-persistent-template
 metadata:
-  name: postgresql-tracks-dc
+  name: minio-tracks-dc
   creationTimestamp:
 parameters:
   - name: ENV_NAME
@@ -27,7 +27,7 @@ parameters:
     displayName: Memory upper limit
     description: Memory upper limit
     required: true
-  - name: DB_PVC_SIZE
+  - name: MINIO_PVC_SIZE
     value: 5G
     displayName: PVC Size
     description: PVC Size
@@ -36,22 +36,22 @@ objects:
   - kind: Service
     apiVersion: v1
     metadata:
-      name: tracks-postgresql
+      name: tracks-minio
       annotations:
-        template.openshift.io/expose-uri: postgres://{.spec.clusterIP}:{.spec.ports[?(.name=="postgresql")].port}
+        template.openshift.io/expose-uri: postgres://{.spec.clusterIP}:{.spec.ports[?(.name=="minio")].port}
       labels:
-        name: postgresql
+        name: minio
         app: tracks
-        role: postgresql
+        role: minio
         env: ${ENV_NAME}
     spec:
       ports:
-        - name: postgresql
+        - name: minio
           protocol: TCP
-          port: 5432
-          targetPort: 5432
+          port: 9000
+          targetPort: 9000
       selector:
-        name: tracks-postgresql
+        name: tracks-minio
       type: ClusterIP
       sessionAffinity: None
     status:
@@ -59,7 +59,7 @@ objects:
   - apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
-      name: tracks-postgresql
+      name: tracks-minio
       annotations:
         volume.beta.kubernetes.io/storage-class: netapp-block-standard
         template.openshift.io.bcgov/create: 'true'
@@ -68,17 +68,17 @@ objects:
         - ReadWriteOnce
       resources:
         requests:
-          storage: "${DB_PVC_SIZE}"
+          storage: "${MINIO_PVC_SIZE}"
   - kind: DeploymentConfig
     apiVersion: v1
     metadata:
       annotations:
         template.alpha.openshift.io/wait-for-ready: 'true'
-      name: tracks-postgresql
+      name: tracks-minio
       labels:
-        name: tracks-postgresql
-        app: tracks-postgresql
-        role: postgresql
+        name: tracks-minio
+        app: tracks-minio
+        role: minio
         env: ${ENV_NAME}
     spec:
       replicas: 1
@@ -88,57 +88,34 @@ objects:
         - type: ConfigChange
       test: false
       selector:
-        name: tracks-postgresql
+        name: tracks-minio
       template:
         metadata:
           creationTimestamp:
           labels:
-            name: tracks-postgresql
+            name: tracks-minio
         spec:
           volumes:
-            - name: postgresql-data
+            - name: minio-data
               persistentVolumeClaim:
-                claimName: tracks-postgresql
+                claimName: tracks-minio
           containers:
-            - name: postgresql
-              image: 'crunchydata/crunchy-postgres-gis:centos7-12.4-3.0-4.4.1'
+            - name: minio
+              image: 'minio/minio'
               ports:
-                - containerPort: 5432
+                - containerPort: 9000
                   protocol: TCP
               env:
-                - name: PG_DATABASE
-                  value: tracks
-                - name: PG_MODE
-                  value: primary
-                - name: PG_PRIMARY_PORT
-                  value: '5432'
-                - name: PGDATA_PATH_OVERRIDE
-                  value: persist
-                - name: PG_PRIMARY_USER
+                - name: MINIO_ACCESS_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: tracks-database-secrets
-                      key: DATABASE_REPLICATION_USER
-                - name: PG_ROOT_PASSWORD
+                      name: tracks-minio-secrets
+                      key: MINIO_ACCESS_KEY
+                - name: MINIO_SECRET_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: tracks-database-secrets
-                      key: DATABASE_ROOT_PASSWORD
-                - name: PG_PRIMARY_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: tracks-database-secrets
-                      key: DATABASE_REPLICATION_PASSWORD
-                - name: PG_USER
-                  valueFrom:
-                    secretKeyRef:
-                      name: tracks-database-secrets
-                      key: DATABASE_USER
-                - name: PG_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: tracks-database-secrets
-                      key: DATABASE_PASSWORD
+                      name: tracks-minio-secrets
+                      key: MINIO_SECRET_KEY
               resources:
                 request:
                   cpu: "${CPU_REQUEST}"
@@ -147,11 +124,11 @@ objects:
                   cpu: "${CPU_LIMIT}"
                   memory: "${MEMORY_LIMIT}"
               volumeMounts:
-                - name: postgresql-data
-                  mountPath: "/pgdata"
+                - name: minio-data
+                  mountPath: "/export"
               readinessProbe:
                 tcpSocket:
-                  port: 5432
+                  port: 9000
                 initialDelaySeconds: 25
                 timeoutSeconds: 1
                 periodSeconds: 10

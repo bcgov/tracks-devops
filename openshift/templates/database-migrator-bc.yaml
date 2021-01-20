@@ -1,0 +1,58 @@
+---
+kind: Template
+apiVersion: v1
+labels:
+  template: tracks-database-migrator-template
+metadata:
+  name: database-migrator
+  creationTimestamp:
+parameters:
+  - name: ENV_NAME
+    displayName: Environment Name
+    description: Environment Name
+    required: true
+objects:
+  - kind: ImageStream
+    apiVersion: image.openshift.io/v1
+    metadata:
+      annotations:
+        description: Tracks Database Migrator Image Stream
+      name: tracks-database-migrator
+    spec:
+      lookupPolicy:
+        local: false
+  - kind: BuildConfig
+    apiVersion: build.openshift.io/v1
+    metadata:
+      annotations:
+        description: Tracks Database Migrator
+      name: tracks-database-migrator
+    spec:
+      nodeSelector: null
+      output:
+        to:
+          kind: ImageStreamTag
+          name: tracks-database-migrator:latest
+      postCommit: { }
+      resources:
+        limits:
+          cpu: 2000m
+          memory: 2G
+        requests:
+          cpu: 500m
+          memory: 200M
+      runPolicy: SerialLatestOnly
+      source:
+        contextDir: migrations
+        git:
+          uri: "https://github.com/bcgov/tracks.git"
+          ref: "main"
+        type: Git
+      strategy:
+        sourceStrategy:
+          from:
+            name: 'nodejs:10'
+            namespace: openshift
+        type: Source
+    status:
+      lastVersion: 0

@@ -1,0 +1,43 @@
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+metadata:
+  annotations:
+    description: Tracks golang-s2i-builder Image Stream
+  name: tracks-golang-s2i-builder
+spec:
+  lookupPolicy:
+    local: false
+---
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  annotations:
+    description: Tracks golang-s2i-builder builder
+  name: tracks-golang-s2i-builder
+spec:
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: tracks-golang-s2i-builder:latest
+  postCommit: { }
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2G
+    requests:
+      cpu: 500m
+      memory: 200M
+  runPolicy: SerialLatestOnly
+  source:
+    contextDir: openshift/golang-s2i
+    git:
+      uri: "https://github.com/bcgov/tracks-devops.git"
+      ref: "main"
+    type: Git
+  strategy:
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+    type: Source
+status:
+  lastVersion: 0

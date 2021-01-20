@@ -15,6 +15,8 @@ parameters:
     required: true
   - name: KEYCLOAK_URL
     required: true
+  - name: JWKS_URL
+    required: true
 objects:
   - kind: ConfigMap
     apiVersion: v1
@@ -25,3 +27,4 @@ objects:
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
       KEYCLOAK_URL: ${KEYCLOAK_URL}
       JWT_ISSUER_URI: ${JWT_ISSUER_URI}
+      JWKS_URL: ${JWKS_URL}
