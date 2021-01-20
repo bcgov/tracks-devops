@@ -4,8 +4,7 @@ echo "copying source"
 cp -Rf /tmp/src/. ./
 find .
 echo "pulling deps"
-go get -d -v ./...
-go install -v ./...
+go get -v ./...
 echo "building app"
-go build -v ./... -o app
+go build -o app -v .
 echo "done"
