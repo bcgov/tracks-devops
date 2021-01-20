@@ -2,8 +2,10 @@
 set -o errexit
 echo "copying source"
 cp -Rf /tmp/src/. ./
+find .
 echo "pulling deps"
-go get -v -d ./...
+go get -d -v ./...
+go install -v ./...
 echo "building app"
-go build -v -o app
+go build -v ./... -o app
 echo "done"
