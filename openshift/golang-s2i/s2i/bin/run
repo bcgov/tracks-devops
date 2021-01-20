@@ -1,2 +1,4 @@
-#!/bin/zsh
+#!/bin/bash -e
+echo "running app"
+find .
 exec app
