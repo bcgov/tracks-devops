@@ -102,6 +102,10 @@ objects:
           containers:
             - name: minio
               image: 'minio/minio'
+              command:
+                - minio
+                - server
+                - /export
               ports:
                 - containerPort: 9000
                   protocol: TCP

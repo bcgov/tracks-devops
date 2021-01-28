@@ -98,6 +98,25 @@ objects:
                   value: 'tracks-postgresql'
                 - name: TRACKS_DB_PORT
                   value: '5432'
+                - name: MINIO_PORT
+                  value: '443'
+                - name: MINIO_HOST
+                  valueFrom:
+                    configMapKeyRef:
+                      name: tracks-keycloak-config
+                      key: MINIO_HOST
+                - name: MINIO_USE_SSL
+                  value: 'true'
+                - name: MINIO_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: tracks-minio-secrets
+                      key: MINIO_ACCESS_KEY
+                - name: MINIO_SECRET_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: tracks-minio-secrets
+                      key: MINIO_SECRET_KEY
                 - name: TRACKS_DB_USER
                   valueFrom:
                     secretKeyRef:

@@ -17,6 +17,8 @@ parameters:
     required: true
   - name: JWKS_URL
     required: true
+  - name: MINIO_HOST
+    required: true
 objects:
   - kind: ConfigMap
     apiVersion: v1
@@ -28,3 +30,4 @@ objects:
       KEYCLOAK_URL: ${KEYCLOAK_URL}
       JWT_ISSUER_URI: ${JWT_ISSUER_URI}
       JWKS_URL: ${JWKS_URL}
+      MINIO_HOST: ${MINIO_HOST}

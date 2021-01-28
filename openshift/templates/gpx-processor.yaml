@@ -2,57 +2,118 @@
 kind: Template
 apiVersion: v1
 labels:
-  template: tracks-gpx-processor-bc-template
+  template: tracks-gpx-processor-template
 metadata:
-  name: gpx-processor-bc
+  name: gpx-processor-dc
   creationTimestamp:
 parameters:
   - name: ENV_NAME
     displayName: Environment Name
     description: Environment Name
     required: true
+  - name: CPU_REQUEST
+    displayName: Requested CPU
+    description: Requested CPU
+    required: true
+  - name: CPU_LIMIT
+    displayName: CPU upper limit
+    description: CPU upper limit
+    required: true
+  - name: MEMORY_REQUEST
+    displayName: Requested memory
+    description: Requested memory
+    required: true
+  - name: MEMORY_LIMIT
+    displayName: Memory upper limit
+    description: Memory upper limit
+    required: true
 objects:
-  - kind: ImageStream
-    apiVersion: image.openshift.io/v1
+  - kind: DeploymentConfig
+    apiVersion: v1
     metadata:
-      annotations:
-        description: Tracks GPX-Processor Image Stream
       name: tracks-gpx-processor
+      labels:
+        name: tracks-gpx-processor
+        app: tracks
+        role: gpx-processor
+        env: ${ENV_NAME}
     spec:
-      lookupPolicy:
-        local: false
-  - kind: BuildConfig
-    apiVersion: build.openshift.io/v1
-    metadata:
-      annotations:
-        description: Tracks GPX Processor builder
-      name: tracks-gpx-processor
-    spec:
-      nodeSelector: null
-      output:
-        to:
-          kind: ImageStreamTag
-          name: tracks-gpx-processor:latest
-      postCommit: { }
-      resources:
-        limits:
-          cpu: 2000m
-          memory: 2G
-        requests:
-          cpu: 500m
-          memory: 200M
-      runPolicy: SerialLatestOnly
-      source:
-        contextDir: gpx_intake_processor
-        git:
-          uri: "https://github.com/bcgov/tracks.git"
-          ref: "main"
-        type: Git
+      replicas: 1
       strategy:
-        sourceStrategy:
-          from:
-            name: 'tracks-golang-s2i-builder:latest'
-            namespace: dgsbmb-tools
-        type: Source
-    status:
-      lastVersion: 0
+        type: Recreate
+      triggers:
+        - type: ImageChange
+          imageChangeParams:
+            automatic: true
+            containerNames:
+              - gpx-processor
+            from:
+              kind: ImageStreamTag
+              name: 'tracks-gpx-processor:latest'
+            type: imageChange
+        - type: ConfigChange
+      test: false
+      selector:
+        name: tracks-gpx-processor
+      template:
+        metadata:
+          creationTimestamp:
+          labels:
+            name: tracks-gpx-processor
+        spec:
+          containers:
+            - name: gpx-processor
+              image: " "
+              env:
+                - name: DATABASE_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: tracks-database-secrets
+                      key: DATABASE_USER
+                - name: DATABASE_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: tracks-database-secrets
+                      key: DATABASE_PASSWORD
+                - name: DATABASE_HOST
+                  value: 'tracks-postgresql'
+                - name: DATABASE_NAME
+                  value: 'tracks'
+                - name: MINIO_ENDPOINT
+                  valueFrom:
+                    configMapKeyRef:
+                      name: tracks-keycloak-config
+                      key: MINIO_HOST
+                - name: MINIO_PORT
+                  value: '443'
+                - name: MINIO_USE_SSL
+                  value: 'true'
+                - name: MINIO_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: tracks-minio-secrets
+                      key: MINIO_ACCESS_KEY
+                - name: MINIO_SECRET_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: tracks-minio-secrets
+                      key: MINIO_SECRET_KEY
+                - name: MINIO_BUCKET_NAME
+                  value: 'gpx'
+              resources:
+                request:
+                  cpu: "${CPU_REQUEST}"
+                  memory: "${MEMORY_REQUEST}"
+                limits:
+                  cpu: "${CPU_LIMIT}"
+                  memory: "${MEMORY_LIMIT}"
+              imagePullPolicy: IfNotPresent
+              securityContext:
+                capabilities: {}
+                privileged: false
+          restartPolicy: Always
+          terminationGracePeriodSeconds: 30
+          dnsPolicy: ClusterFirst
+          securityContext: {}
+          schedulerName: default-scheduler
+    status: {}
