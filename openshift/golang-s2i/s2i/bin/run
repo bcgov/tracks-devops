@@ -2,4 +2,4 @@
 echo "files in image:"
 find .
 echo "running app"
-exec app
+exec ./app
