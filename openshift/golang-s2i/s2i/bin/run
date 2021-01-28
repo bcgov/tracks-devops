@@ -1,3 +1,5 @@
-#!/bin/bash -e
+#!/bin/bash -ea
+echo "files in image:"
+find .
 echo "running app"
 exec app
